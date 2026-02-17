@@ -20,7 +20,7 @@
  *     1. By points DESCENDING
  *     2. If points are equal, by team name ASCENDING (alphabetical)
  *
- * Validation:
+ * Validation:  
  *   - Agar matches array nahi hai ya empty hai, return []
  *
  * @param {Array<{team1: string, team2: string, result: string, winner?: string}>} matches
@@ -37,5 +37,74 @@
  *   // Sorted: CSK(3), RCB(1), MI(0)
  */
 export function iplPointsTable(matches) {
-  // Your code here
+  if(!Array.isArray(matches) || matches.length === 0){
+    return []
+  }
+
+  const pointsTable = {}
+
+  for(let i=0; i<matches.length; i++){
+
+    let match = matches[i];
+    const {team1, team2, result, winner} = match;
+
+    if(!pointsTable[team1]){
+      pointsTable[team1] = {
+          team : team1,
+          played : 0,
+          won : 0,
+          lost : 0,
+          tied : 0,
+          noResult : 0,
+          points : 0 
+      }
+    }
+
+    if(!pointsTable[team2]){
+      pointsTable[team2] = {
+          team : team2,
+          played : 0,
+          won : 0,
+          lost : 0,
+          tied : 0,
+          noResult : 0,
+          points : 0
+      }
+    }
+
+    pointsTable[team1].played += 1;
+    pointsTable[team2].played += 1;
+
+    switch(result){
+      case "win":
+        if(winner === team1){
+          pointsTable[team1].won += 1
+          pointsTable[team2].lost += 1
+          pointsTable[team1].points += 2
+        }
+        else if(winner === team2){
+          pointsTable[team1].lost += 1
+          pointsTable[team2].won += 1
+          pointsTable[team2].points += 2
+        }
+        break;
+      case "tie":
+        pointsTable[team1].tied += 1;
+        pointsTable[team2].tied += 1;
+        pointsTable[team1].points += 1
+        pointsTable[team2].points += 1
+        break;
+      case "no_result" : 
+        pointsTable[team1].noResult += 1
+        pointsTable[team2].noResult += 1
+        pointsTable[team1].points += 1
+        pointsTable[team2].points += 1
+    }
+  }
+  
+  const arrayTable = Object.values(pointsTable);
+
+  return arrayTable
+  .sort((a,b) => b.points - a.points || a.team.localeCompare(b.team))
+
 }
