@@ -45,5 +45,57 @@
  *   // => [{ name: "Rahul", trainNumber: "12345", class: "sleeper", status: "confirmed" }]
  */
 export function railwayReservation(passengers, trains) {
-  // Your code here
+  if(!Array.isArray(passengers) || passengers.length===0 || !Array.isArray(trains) || trains.length===0){
+    return []
+  }
+
+  const result = [];
+
+  for(let i=0; i<passengers.length; i++){
+
+    let allocatedClass;
+    let status;
+    let trainFound = false
+
+    const { name, trainNumber, preferred, fallback} = passengers[i]
+
+    for(let j=0; j<trains.length; j++){
+      const train = trains[j]
+      if(trainNumber === train.trainNumber){
+        if(train.seats?.[preferred] > 0){
+          allocatedClass = preferred;
+          status = "confirmed"
+          train.seats[preferred]--
+          trainFound = true
+          break
+        }
+        else if(train.seats?.[fallback] > 0){
+          allocatedClass = fallback
+          status = "confirmed"
+          train.seats[fallback]--
+          trainFound = true
+          break
+        }
+        else {
+          allocatedClass = preferred;
+          status = "waitlisted"
+          trainFound = true
+          break
+        }
+        }
+        else {
+          allocatedClass = null
+        }
+    }
+
+    result.push({
+      name,
+      trainNumber,
+      class : allocatedClass,
+      status : trainFound ? status : "train_not_found"
+    })
+  }
+
+  return result
+
 }
